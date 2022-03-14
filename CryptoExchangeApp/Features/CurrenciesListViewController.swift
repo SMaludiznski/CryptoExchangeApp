@@ -43,13 +43,17 @@ final class CurrenciesListViewController: UIViewController {
 
 extension CurrenciesListViewController {
     private func bindUI() {
-        vm.isLoading
-            .subscribe(onNext: { isLoading in
-                switch (isLoading) {
-                case true:
+        vm.downloadingState
+            .subscribe(onNext: { state in
+                switch state {
+                case .isLoading:
                     self.view = LoadingView()
-                case false:
+                case .success:
                     self.view = self.tableView
+                case .failure(error: let error):
+                    self.view = ErrorView(title: "Networking error", error: error, imageName: "", buttonTitle: "Refresh", handler: {
+                        self.vm.fetchCurrencies()
+                    })
                 }
             })
             .disposed(by: disposeBag)
@@ -65,3 +69,4 @@ extension CurrenciesListViewController {
         .disposed(by: disposeBag)
     }
 }
+

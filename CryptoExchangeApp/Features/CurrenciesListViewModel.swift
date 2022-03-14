@@ -11,22 +11,21 @@ import RxRelay
 
 final class CurrenciesListViewModel {
     private let disposeBag = DisposeBag()
-    let isLoading = PublishRelay<Bool>()
+    let downloadingState = PublishRelay<DownloadingStates>()
     let currencies = BehaviorRelay<[Currency]>(value: [])
     
     func fetchCurrencies() {
-        isLoading.accept(true)
+        downloadingState.accept(.isLoading)
         let observable: Observable<[Currency]> = NetworkEngine.downloadData(endpoint: CurrencyEndpoint.fetchCurrencies)
-            
+        
         observable
             .subscribe(onNext: { response in
                 DispatchQueue.main.async { [weak self] in
                     self?.currencies.accept(response)
-                    self?.isLoading.accept(false)
+                    self?.downloadingState.accept(.success)
                 }
             }, onError: { error in
-                print(error)
-                self.isLoading.accept(false)
+                self.downloadingState.accept(.failure(error: error))
             })
             .disposed(by: disposeBag)
     }
