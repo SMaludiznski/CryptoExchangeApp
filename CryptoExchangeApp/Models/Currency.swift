@@ -14,8 +14,8 @@ struct Currency: Decodable {
     let image: String
     let currentPrice: Double
     let rank: Int
-    let percentageChange: Double
-    let percentageDayChange: Double
+    let percentageChange: Double?
+    let percentageDayChange: Double?
     let priceValues: Price
     
     private enum CodingKeys: String, CodingKey {

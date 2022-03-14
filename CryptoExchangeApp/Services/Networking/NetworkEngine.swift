@@ -9,17 +9,14 @@ import Foundation
 import RxSwift
 
 final class NetworkEngine {
-
+    
     static func downloadData<T: Decodable>(endpoint: Endpoint) -> Observable<T> {
-        
         return Observable.create { observer -> Disposable in
-            
             do {
                 let urlRequest = try APIRequest.request(from: endpoint)
                 
                 URLSession.shared.dataTask(with: urlRequest) { data, response, error in
                     if error != nil {
-                        print("error!")
                         observer.onError(NetworkingErrors.downloadingError)
                         return
                     }
@@ -39,8 +36,8 @@ final class NetworkEngine {
                         do {
                             let decodedData: T = try ParseDataEngine.parseData(data)
                             observer.onNext(decodedData)
-                            //observer.onError(NetworkingErrors.downloadingError)
                         } catch {
+                            print(error)
                             observer.onError(NetworkingErrors.decodingError)
                         }
                     }
@@ -50,7 +47,6 @@ final class NetworkEngine {
             } catch {
                 observer.onError(error)
             }
-            
             return Disposables.create()
         }
     }

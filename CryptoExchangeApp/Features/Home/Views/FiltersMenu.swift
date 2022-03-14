@@ -6,8 +6,12 @@
 //
 
 import UIKit
+import RxSwift
+import RxRelay
 
 final class FiltersMenu: UIView, UIContextMenuInteractionDelegate {
+    let filterState = PublishRelay<FiltersStates>()
+    
     lazy var filtersButton: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -15,7 +19,7 @@ final class FiltersMenu: UIView, UIContextMenuInteractionDelegate {
         imageView.tintColor = .fontColor
         return imageView
     }()
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -26,13 +30,7 @@ final class FiltersMenu: UIView, UIContextMenuInteractionDelegate {
     }
     
     private func setupView() {
-        self.addSubview(filtersButton)
-        self.layer.cornerRadius = 10
-        self.clipsToBounds = true
-        self.backgroundColor = .backgroundColor
-        
-        let menuInteraction = UIContextMenuInteraction(delegate: self)
-        filtersButton.addInteraction(menuInteraction)
+        configureView()
         
         NSLayoutConstraint.activate([
             filtersButton.widthAnchor.constraint(equalToConstant: 25),
@@ -42,34 +40,28 @@ final class FiltersMenu: UIView, UIContextMenuInteractionDelegate {
         ])
     }
     
-    func makeContextMenu() -> UIMenu {
-
-        let priceAscending = UIAction(title: "Price - ascending", image: UIImage(systemName: "arrowtriangle.up")) { action in
-            print("Up")
-        }
-        
-        let priceDescending = UIAction(title: "Price - descending", image: UIImage(systemName: "arrowtriangle.down")) { action in
-            print("Down")
-        }
-        
-        let percentageAscending = UIAction(title: "Percentage change - ascending", image: UIImage(systemName: "arrowtriangle.up")) { action in
-            print("Up")
-        }
-        
-        let percentageDescending = UIAction(title: "Percentage change - descending", image: UIImage(systemName: "arrowtriangle.down")) { action in
-            print("Down")
-        }
-
-        return UIMenu(title: "Filters",image: UIImage(systemName: "slider.horizontal.3"), children: [priceAscending, priceDescending, percentageAscending, percentageDescending])
+    private func configureView() {
+        self.addSubview(filtersButton)
+        self.layer.cornerRadius = 10
+        self.clipsToBounds = true
+        self.backgroundColor = .backgroundColor
     }
 }
 
+//MARK: - Set up context menu
 extension FiltersMenu {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { suggestedActions in
-
-            return self.makeContextMenu()
+            var menuActions = [UIAction]()
+            
+            for filter in FiltersStates.allCases {
+                let action = UIAction(title: filter.filterTitle, image: UIImage(systemName: filter.filterIcon)) { action in
+                    self.filterState.accept(filter)
+                }
+                menuActions.append(action)
+            }
+            
+            return UIMenu(title: "Filters", image: UIImage(systemName: "slider.horizontal.3"), children: menuActions)
         })
     }
 }

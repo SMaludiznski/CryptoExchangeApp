@@ -28,7 +28,6 @@ final class SearchBarView: UIView {
     
     private func setupView() {
         configureView()
-        
         self.addSubview(searchField)
         
         NSLayoutConstraint.activate([

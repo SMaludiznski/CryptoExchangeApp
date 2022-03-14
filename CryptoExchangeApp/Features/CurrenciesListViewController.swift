@@ -13,6 +13,7 @@ import RxCocoa
 final class CurrenciesListViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let vm = CurrenciesListViewModel()
+    let filterState = BehaviorRelay<FiltersStates>(value: .none)
     let query = BehaviorRelay<String>(value: "")
     
     private lazy var tableView = UITableView()
@@ -41,6 +42,7 @@ final class CurrenciesListViewController: UIViewController {
     }
 }
 
+//MARK: - Bind UI
 extension CurrenciesListViewController {
     private func bindUI() {
         vm.downloadingState
@@ -58,15 +60,33 @@ extension CurrenciesListViewController {
             })
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(vm.currencies.asObservable(), query) { currencies, query in
+        Observable.combineLatest(vm.currencies.asObservable(), query, filterState) { currencies, query, _ in
             currencies.filter({ currency in
                 query.isEmpty || currency.name.lowercased().contains(query.lowercased()) || currency.symbol.lowercased().contains(query.lowercased())
             })
         }
+        .map({ currencies in
+            return currencies.sorted { (firstCurrency, secondCurrency) -> Bool in
+                return self.filterState.value.filterLogic(firstCurrency: firstCurrency, secondCurrency: secondCurrency)
+            }
+        })
         .bind(to: tableView.rx.items(cellIdentifier: CurrencyCell.identifier, cellType: CurrencyCell.self)) { row, currency, cell in
             cell.configureCell(with: currency)
         }
         .disposed(by: disposeBag)
+        
+        tableView.rx.contentOffset
+            .subscribe(onNext: { value in
+                let offsetY = self.tableView.contentOffset.y
+                let contentHeight = self.tableView.contentSize.height
+                
+                if offsetY > contentHeight - (2 * self.tableView.frame.height) {
+                    if self.vm.fetchMoreFlag {
+                        self.vm.fetchMoreFlag = false
+                        self.vm.fetchMoreCurrencies()
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }
-

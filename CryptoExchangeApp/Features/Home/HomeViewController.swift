@@ -107,5 +107,11 @@ extension HomeViewController {
         searchBarView.searchField.rx.text.orEmpty
             .bind(to: self.currenciesList.query)
             .disposed(by: disposeBag)
+        
+        filtersMenu.filterState
+            .subscribe(onNext: { filter in
+                self.currenciesList.filterState.accept(filter)
+            })
+            .disposed(by: disposeBag)
     }
 }
