@@ -38,7 +38,8 @@ final class CurrenciesListViewController: UIViewController {
     }
     
     func refresh() {
-        vm.fetchCurrencies()
+        vm.refreshCurrencies()
+        tableView.contentOffset.y = 0
     }
 }
 

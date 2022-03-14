@@ -32,15 +32,15 @@ enum FiltersStates: CaseIterable {
     var filterIcon: String {
         switch self {
         case .none:
-            return "camera.metering.none"
+            return "minus.rectangle"
         case .priceAscending:
             return "arrowtriangle.up"
         case .priceDescending:
             return "arrowtriangle.down"
         case .percentageAscending:
-            return "arrowtriangle.up"
+            return "arrowtriangle.up.fill"
         case .percentageDescending:
-            return "arrowtriangle.down"
+            return "arrowtriangle.down.fill"
         }
     }
     

@@ -32,6 +32,11 @@ final class CurrenciesListViewModel {
             .disposed(by: disposeBag)
     }
     
+    func refreshCurrencies() {
+        currentPage = 1
+        fetchCurrencies()
+    }
+    
     func fetchMoreCurrencies() {
         currentPage += 1
         let observable: Observable<[Currency]> = NetworkEngine.downloadData(endpoint: CurrencyEndpoint.fetchCurrencies(page: currentPage))
