@@ -13,8 +13,9 @@ import RxCocoa
 final class CurrenciesListViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let vm = CurrenciesListViewModel()
-    let filterState = BehaviorRelay<FiltersStates>(value: .none)
     let query = BehaviorRelay<String>(value: "")
+    let filterState = BehaviorRelay<FiltersStates>(value: .none)
+    let selectedCurrency = PublishRelay<Currency>()
     
     private lazy var tableView = UITableView()
     
@@ -86,6 +87,14 @@ extension CurrenciesListViewController {
                         self.vm.fetchMoreFlag = false
                         self.vm.fetchMoreCurrencies()
                     }
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        tableView.rx.itemSelected
+            .subscribe(onNext: { [weak self] index in
+                if let currency = self?.vm.currencies.value[index.row] {
+                    self?.selectedCurrency.accept(currency)
                 }
             })
             .disposed(by: disposeBag)

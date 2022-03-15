@@ -12,7 +12,8 @@ final class ParseDataEngine {
     static func parseData<T: Decodable>(_ data: Data) throws -> T {
         do {
             return try JSONDecoder().decode(T.self, from: data)
-        } catch {
+        } catch let error {
+            print(error)
             throw NetworkingErrors.decodingError
         }
     }

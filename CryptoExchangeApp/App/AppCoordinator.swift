@@ -8,7 +8,11 @@
 import Foundation
 import UIKit
 
-final class AppCoordinator: Coordinator {
+protocol HomeCoordinator {
+    func openDetailView(of currency: Currency)
+}
+
+final class AppCoordinator: Coordinator, HomeCoordinator {
     var children: [Coordinator] = [Coordinator]()
     var navigationController: UINavigationController
     
@@ -19,6 +23,12 @@ final class AppCoordinator: Coordinator {
     func start() {
         let vc = HomeViewController()
         vc.coordinator = self
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func openDetailView(of currency: Currency) {
+        let vc = CurrencyDetailViewController()
+        vc.configureView(with: currency)
         navigationController.pushViewController(vc, animated: true)
     }
 }

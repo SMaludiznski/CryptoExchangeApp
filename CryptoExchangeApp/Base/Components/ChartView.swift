@@ -9,14 +9,10 @@ import UIKit
 
 final class ChartView: UIView {
     private var chartData: [Double] = []
-    private let background: UIColor
-    private let strokeColor: UIColor
     private var isPositive: Bool = false
     
-    init(background: UIColor = .white, strokeColor: UIColor = .darkGray) {
-        self.background = background
-        self.strokeColor = strokeColor
-        super.init(frame: .zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setupView()
     }
     
@@ -25,7 +21,7 @@ final class ChartView: UIView {
     }
     
     private func setupView() {
-        self.backgroundColor = background
+        self.backgroundColor = .clear
         self.translatesAutoresizingMaskIntoConstraints = false
     }
     
@@ -39,23 +35,23 @@ final class ChartView: UIView {
         guard let context = UIGraphicsGetCurrentContext(),
               let minValue = chartData.min() else { return }
         
-        
         var currencyValues = [Double]()
         for currencyValue in chartData {
-            currencyValues.append(currencyValue - (minValue - (minValue / 75)))
+            currencyValues.append(currencyValue - (minValue - (minValue / 5000)))
         }
         
         guard let maxValue = currencyValues.max() else { return }
         
-        let red: UIColor = .appRedColor ?? .systemRed.withAlphaComponent(0.5)
-        let green: UIColor = .appGreenColor ?? .systemGreen.withAlphaComponent(0.5)
+        let width = self.bounds.size.width
+        let height = self.bounds.size.height
+        
+        let red: UIColor = .appRedColor ?? .systemRed.withAlphaComponent(0.2)
+        let green: UIColor = .appGreenColor ?? .systemGreen.withAlphaComponent(0.2)
         
         let shadowColor: CGColor = (isPositive) ? green.cgColor : red.cgColor
         
-        let width = self.bounds.size.width
-        let height = self.bounds.size.height
         let stepWidth = width / CGFloat(currencyValues.count)
-        let multiplier = (height / (maxValue + (maxValue / 20)))
+        let multiplier = (height / (maxValue + (maxValue / 500)))
         
         var currentX = 0.0
         var currentY = (height - (currencyValues[0] * multiplier))
@@ -63,11 +59,10 @@ final class ChartView: UIView {
         for currencyValue in currencyValues {
             let stepHeight = (height-(currencyValue * multiplier))
             
-            context.setStrokeColor(UIColor.darkGray.cgColor)
-            context.setLineWidth(0.5)
+            context.setStrokeColor(shadowColor)
+            context.setLineWidth(0.8)
             context.move(to: CGPoint(x: currentX, y: currentY))
             context.addLine(to: CGPoint(x: (currentX + stepWidth), y: stepHeight))
-            context.setShadow(offset: CGSize(width: 1, height: 0), blur: 1.0, color: shadowColor)
             context.strokePath()
             
             currentX += stepWidth

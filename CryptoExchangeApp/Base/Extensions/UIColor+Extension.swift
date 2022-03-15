@@ -11,7 +11,7 @@ import UIKit
 extension UIColor {
     static let backgroundColor = UIColor(named: "Background")
     static let cellBackgroundColor = UIColor(named: "CellBackground")
-    static let imageBackgroundColor = UIColor(named: "ImageBackground")
+    static let chartBackgroundColor = UIColor(named: "ChartBackground")
     static let fontColor = UIColor(named: "Font")
     static let appRedColor = UIColor(named: "AppRed")
     static let appGreenColor = UIColor(named: "AppGreen")

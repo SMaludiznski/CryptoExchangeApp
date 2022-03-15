@@ -26,8 +26,8 @@ final class CurrenciesListViewModel {
                     self?.currencies.accept(response)
                     self?.downloadingState.accept(.success)
                 }
-            }, onError: { error in
-                self.downloadingState.accept(.failure(error: error))
+            }, onError: { [weak self] error in
+                self?.downloadingState.accept(.failure(error: error))
             })
             .disposed(by: disposeBag)
     }
@@ -46,10 +46,10 @@ final class CurrenciesListViewModel {
                 let actualCurrencies = self.currencies.value
                 self.currencies.accept(actualCurrencies + response)
                 self.fetchMoreFlag = true
-            }, onError: { error in
-                self.currentPage -= 1
+            }, onError: { [weak self] error in
+                self?.currentPage -= 1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self.fetchMoreFlag = true
+                    self?.fetchMoreFlag = true
                 }
             })
             .disposed(by: disposeBag)

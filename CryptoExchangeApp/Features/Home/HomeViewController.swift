@@ -11,7 +11,7 @@ import RxCocoa
 
 final class HomeViewController: UIViewController {
     private let disposeBag = DisposeBag()
-    var coordinator: Coordinator?
+    var coordinator: HomeCoordinator?
     
     private lazy var mainStack: UIStackView = {
         let stack = UIStackView()
@@ -29,14 +29,7 @@ final class HomeViewController: UIViewController {
         return stack
     }()
     
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Live prices"
-        label.font = .systemFont(ofSize: 21, weight: .bold)
-        label.textColor = .fontColor
-        return label
-    }()
-    
+    private lazy var titleLabel = TitleLabel(title: "Live prices")
     private lazy var searchBarView = SearchBarView()
     private lazy var filtersMenu = FiltersMenu()
     private lazy var currenciesList = CurrenciesListViewController()
@@ -111,6 +104,12 @@ extension HomeViewController {
         filtersMenu.filterState
             .subscribe(onNext: { filter in
                 self.currenciesList.filterState.accept(filter)
+            })
+            .disposed(by: disposeBag)
+        
+        currenciesList.selectedCurrency
+            .subscribe(onNext: { [weak self] currency in
+                self?.coordinator?.openDetailView(of: currency)
             })
             .disposed(by: disposeBag)
     }
