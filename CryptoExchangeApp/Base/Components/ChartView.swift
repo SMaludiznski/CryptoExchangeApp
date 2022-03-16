@@ -60,7 +60,7 @@ final class ChartView: UIView {
             let stepHeight = (height-(currencyValue * multiplier))
             
             context.setStrokeColor(shadowColor)
-            context.setLineWidth(0.8)
+            context.setLineWidth(1.5)
             context.move(to: CGPoint(x: currentX, y: currentY))
             context.addLine(to: CGPoint(x: (currentX + stepWidth), y: stepHeight))
             context.strokePath()

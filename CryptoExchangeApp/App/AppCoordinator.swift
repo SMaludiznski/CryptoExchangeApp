@@ -27,7 +27,8 @@ final class AppCoordinator: Coordinator, HomeCoordinator {
     }
     
     func openDetailView(of currency: Currency) {
-        let vc = CurrencyDetailViewController()
+//        let vc = CurrencyDetailViewController()
+        let vc = CurrencyDetailsViewController()
         vc.configureView(with: currency)
         navigationController.pushViewController(vc, animated: true)
     }

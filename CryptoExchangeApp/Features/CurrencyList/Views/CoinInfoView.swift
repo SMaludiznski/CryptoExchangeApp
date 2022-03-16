@@ -4,7 +4,6 @@
 //
 //  Created by Sebastian Maludziński on 09/03/2022.
 //
-
 import UIKit
 
 final class CoinInfoView: UILabel {

@@ -1,17 +1,13 @@
 //
-//  CurrencyDetailViewController.swift
+//  DetailsView.swift
 //  CryptoExchangeApp
 //
-//  Created by Sebastian Maludziński on 14/03/2022.
+//  Created by Sebastian Maludziński on 15/03/2022.
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 
-final class CurrencyDetailViewController: UIViewController {
-    private let disposeBag = DisposeBag()
-    private let vm = CurrencyDetailViewModel()
+final class DetailsView: UIView {
     
     private lazy var mainStack: UIStackView = {
         let stack = UIStackView()
@@ -38,21 +34,21 @@ final class CurrencyDetailViewController: UIViewController {
     private lazy var athLabel = CurrencyInfoView()
     private lazy var atlLabel = CurrencyInfoView()
     private lazy var marketCapLabel = CurrencyInfoView()
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
+
+    init(currencyDetails: CurrencyDetail) {
+        super.init(frame: .zero)
+        setupView()
+        self.configureCurrencyDetails(with: currencyDetails)
     }
     
-    override func loadView() {
-        super.loadView()
-        setupView()
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func setupView() {
-        bindUI()
-        view.backgroundColor = .backgroundColor
+        self.backgroundColor = .backgroundColor
         
-        view.addSubview(mainStack)
+        self.addSubview(mainStack)
         mainStack.addArrangedSubview(chartContainer)
         chartContainer.addArrangedSubview(chartView)
         
@@ -65,23 +61,16 @@ final class CurrencyDetailViewController: UIViewController {
         mainStack.addArrangedSubview(UIView())
         
         NSLayoutConstraint.activate([
-            mainStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            mainStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            mainStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
-            mainStack.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            mainStack.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
+            mainStack.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
+            mainStack.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10),
+            mainStack.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
             chartView.heightAnchor.constraint(equalTo: chartView.widthAnchor, multiplier: 0.4)
         ])
     }
     
-    func configureView(with currency: Currency) {
-        vm.fetchCurrencies(id: currency.id)
-        
-        navigationItem.titleView = TitleLabel(title: currency.name)
-        chartView.fillChartWith(data: currency.priceValues.price, isPositive: currency.percentageWeekChange ?? -1 > 0)
-    }
-    
-    private func configureCurrencyDetails(with currency: CurrencyDetail) {        
+    private func configureCurrencyDetails(with currency: CurrencyDetail) {
         currentPriceLabel.configureViewWith(title: "Price",
                                             value: currency.marketData.currentPrice.pln,
                                             percentageChange: currency.marketData.pricePercentage24h)
@@ -105,16 +94,7 @@ final class CurrencyDetailViewController: UIViewController {
         marketCapLabel.configureViewWith(title: "Market Cap",
                                          value: currency.marketData.marketCap["pln"] ?? 0,
                                          percentageChange: currency.marketData.marketCapPercentage24h)
-    }
-}
-
-//MARK: - Bind UI
-extension CurrencyDetailViewController {
-    private func bindUI() {
-        vm.currencyDetail
-            .subscribe(onNext: { [weak self] currency in
-                self?.configureCurrencyDetails(with: currency)
-            })
-            .disposed(by: disposeBag)
+        
+        chartView.fillChartWith(data: currency.marketData.sparkline.price, isPositive: true)
     }
 }

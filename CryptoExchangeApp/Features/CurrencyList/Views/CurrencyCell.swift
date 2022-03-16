@@ -28,7 +28,7 @@ final class CurrencyCell: UITableViewCell {
         label.font = .systemFont(ofSize: 15, weight: .semibold)
         label.textColor = .lightGray
         label.textAlignment = .center
-        label.widthAnchor.constraint(equalToConstant: 35).isActive = true
+        label.widthAnchor.constraint(equalToConstant: 30).isActive = true
         return label
     }()
     
@@ -69,9 +69,5 @@ final class CurrencyCell: UITableViewCell {
         rankLabel.text = String(currency.rank)
         nameLabel.configureViewWith(name: currency.name, symbol: currency.symbol)
         infoLabel.configureViewWith(price: currency.currentPrice, priceChange: currency.percentageDayChange ?? 0)
-        
-        if currency.rank >= 1000 {
-            rankLabel.font = .systemFont(ofSize: 12, weight: .semibold)
-        }
     }
 }

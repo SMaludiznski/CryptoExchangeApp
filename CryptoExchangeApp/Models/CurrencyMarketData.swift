@@ -14,6 +14,7 @@ struct CurrencyMarketData: Decodable {
     let marketCapPercentage24h: Double
     let highPrice24h: [String: Double]
     let lowPrice24h: [String: Double]
+    let sparkline: Price
     
     let athPrice: [String: Double]
     let athPercentage24h: [String: Double]
@@ -29,6 +30,7 @@ struct CurrencyMarketData: Decodable {
         case pricePercentage24h = "price_change_percentage_24h"
         case highPrice24h = "high_24h"
         case lowPrice24h = "low_24h"
+        case sparkline = "sparkline_7d"
         
         case athPrice = "ath"
         case athPercentage24h = "ath_change_percentage"
