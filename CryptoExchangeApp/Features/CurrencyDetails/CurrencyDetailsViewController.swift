@@ -9,7 +9,6 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-
 final class CurrencyDetailsViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let vm = CurrencyDetailsViewModel()
@@ -17,12 +16,10 @@ final class CurrencyDetailsViewController: UIViewController {
     
     private lazy var container = UIViewController()
     
-    deinit {
-        print("View Controller deinit")
-    }
-    
-    override func loadView() {
-        super.loadView()
+    func configureView(with currency: Currency) {
+        currentCurrency = currency
+        bindUI()
+        vm.fetchDetails(currency: currency)
         setupView()
     }
     
@@ -41,10 +38,34 @@ final class CurrencyDetailsViewController: UIViewController {
         ])
     }
     
-    func configureView(with currency: Currency) {
-        currentCurrency = currency
-        bindUI()
-        vm.fetchDetails(currency: currency)
+    private func viewSwitcher(state: DownloadingStates) {
+        DispatchQueue.main.async {
+            switch state {
+            case .success:
+                self.generateDetailView()
+            case .isLoading:
+                self.container.view = LoadingView()
+            case .failure(let error):
+                self.generateErrorView(error)
+            }
+        }
+    }
+    
+    private func generateDetailView() {
+        if let currency = self.vm.currencyDetails.value {
+            self.navigationItem.titleView = TitleLabel(title: currency.name)
+            self.container.view = DetailsView(currencyDetails: currency)
+        }
+    }
+    
+    private func generateErrorView(_ error: Error) {
+        self.container.view = ErrorView(title: "Error", error: error, imageName: "", buttonTitle: "Refresh", handler: {
+            if let currentCurrency = self.currentCurrency {
+                self.configureView(with: currentCurrency)
+            } else {
+                self.navigationController?.popToRootViewController(animated: true)
+            }
+        })
     }
 }
 
@@ -56,27 +77,5 @@ extension CurrencyDetailsViewController {
                 self?.viewSwitcher(state: state)
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func viewSwitcher(state: DownloadingStates) {
-        DispatchQueue.main.async {
-            switch state {
-            case .success:
-                if let currency = self.vm.currencyDetails.value {
-                    self.navigationItem.titleView = TitleLabel(title: currency.name)
-                    self.container.view = DetailsView(currencyDetails: currency)
-                }
-            case .isLoading:
-                self.container.view = LoadingView()
-            case .failure(let error):
-                self.container.view = ErrorView(title: "Error", error: error, imageName: "", buttonTitle: "Refresh", handler: {
-                    if let currentCurrency = self.currentCurrency {
-                        self.configureView(with: currentCurrency)
-                    } else {
-                        self.navigationController?.popToRootViewController(animated: true)
-                    }
-                })
-            }
-        }
     }
 }

@@ -38,8 +38,8 @@ final class CurrenciesListViewController: UIViewController {
     }
     
     func refresh() {
-        vm.refreshCurrencies()
         tableView.contentOffset.y = 0
+        vm.refreshCurrencies()
     }
 }
 
@@ -52,7 +52,9 @@ extension CurrenciesListViewController {
                 case .isLoading:
                     self.view = LoadingView()
                 case .success:
-                    self.view = self.tableView
+                    DispatchQueue.main.async { [weak self] in
+                        self?.view = self?.tableView
+                    }
                 case .failure(error: let error):
                     self.view = ErrorView(title: "Networking error", error: error, imageName: "", buttonTitle: "Refresh", handler: {
                         self.vm.fetchCurrencies()
@@ -84,7 +86,7 @@ extension CurrenciesListViewController {
                 if offsetY > contentHeight - (2 * self.tableView.frame.height) {
                     if self.vm.fetchMoreFlag {
                         self.vm.fetchMoreFlag = false
-                        self.vm.fetchMoreCurrencies()
+                        self.vm.loadNextPage()
                     }
                 }
             })

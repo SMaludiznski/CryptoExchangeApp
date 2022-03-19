@@ -10,20 +10,27 @@ import RxRelay
 
 final class CurrenciesListViewModel {
     private let disposeBag = DisposeBag()
+    private var currentPage = 1
+    var fetchMoreFlag = true
+    
     let downloadingState = PublishRelay<DownloadingStates>()
     let currencies = BehaviorRelay<[Currency]>(value: [])
-    var fetchMoreFlag = true
-    private var currentPage = 1
     
-    func fetchCurrencies() {
-        downloadingState.accept(.isLoading)
-        let observable: Observable<[Currency]> = NetworkEngine.downloadData(endpoint: CurrencyEndpoint.fetchCurrencies(page: currentPage))
+    func fetchCurrencies(page: Int = 1) {
+        if currentPage == 1 {
+            downloadingState.accept(.isLoading)
+        }
+        
+        let currentCurrencies = currencies.value
+        let observable: Observable<[Currency]> = NetworkEngine.downloadData(endpoint: CurrencyEndpoint.fetchCurrencies(page: page))
         
         observable
             .subscribe(onNext: { response in
                 DispatchQueue.main.async { [weak self] in
-                    self?.currencies.accept(response)
+                    self?.currencies.accept(currentCurrencies + response)
+                    self?.fetchMoreFlag = true
                     self?.downloadingState.accept(.success)
+                    print(self?.currencies.value.count ?? 0)
                 }
             }, onError: { [weak self] error in
                 self?.downloadingState.accept(.failure(error: error))
@@ -32,25 +39,13 @@ final class CurrenciesListViewModel {
     }
     
     func refreshCurrencies() {
+        currencies.accept([])
+        fetchCurrencies(page: 1)
         currentPage = 1
-        fetchCurrencies()
     }
     
-    func fetchMoreCurrencies() {
+    func loadNextPage() {
         currentPage += 1
-        let observable: Observable<[Currency]> = NetworkEngine.downloadData(endpoint: CurrencyEndpoint.fetchCurrencies(page: currentPage))
-        
-        observable
-            .subscribe(onNext: { response in
-                let actualCurrencies = self.currencies.value
-                self.currencies.accept(actualCurrencies + response)
-                self.fetchMoreFlag = true
-            }, onError: { [weak self] error in
-                self?.currentPage -= 1
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self?.fetchMoreFlag = true
-                }
-            })
-            .disposed(by: disposeBag)
+        fetchCurrencies(page: currentPage)
     }
 }

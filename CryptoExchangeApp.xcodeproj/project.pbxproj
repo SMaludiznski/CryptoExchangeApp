@@ -253,8 +253,8 @@
 		B8F05D1C27D77AC500A6F5D0 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				B826BD0F27E1FCB900D653B8 /* CurrencyList */,
 				B8F05D1D27D77AD100A6F5D0 /* Home */,
+				B826BD0F27E1FCB900D653B8 /* CurrencyList */,
 				B826BD0827E1E3B100D653B8 /* CurrencyDetails */,
 			);
 			path = Features;

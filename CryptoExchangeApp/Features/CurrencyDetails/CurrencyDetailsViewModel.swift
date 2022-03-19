@@ -15,10 +15,6 @@ final class CurrencyDetailsViewModel {
     let state = PublishRelay<DownloadingStates>()
     let currencyDetails = BehaviorRelay<CurrencyDetail?>(value: nil)
     
-    deinit {
-        print("View model deinit")
-    }
-    
     func fetchDetails(currency: Currency) {
         state.accept(.isLoading)
         let observable: Observable<CurrencyDetail> = NetworkEngine.downloadData(endpoint: CurrencyEndpoint.fetchCurrencyDetails(id: currency.id))

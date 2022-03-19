@@ -74,23 +74,10 @@ final class HomeViewController: UIViewController {
         navigationController?.navigationBar.tintColor = .fontColor
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refreshCurrencies))
-        
-        let settingsButton = UIBarButtonItem(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(openSettings))
-        let walletButton = UIBarButtonItem(image: UIImage(systemName: "wallet.pass"), style: .plain, target: self, action: #selector(openWallet))
-        
-        navigationItem.rightBarButtonItems = [settingsButton, walletButton]
     }
     
     @objc private func refreshCurrencies() {
         currenciesList.refresh()
-    }
-    
-    @objc private func openSettings() {
-        print("Open settings")
-    }
-    
-    @objc private func openWallet() {
-        print("Open wallet")
     }
 }
 
